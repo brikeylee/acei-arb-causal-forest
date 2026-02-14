@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perioperative ACEI/ARB Decision Tool</title>
+<style>
+  :root {
+    --navy: #1a365d;
+    --blue: #2b6cb0;
+    --blue-light: #ebf4ff;
+    --green-dark: #276749;
+    --green: #38a169;
+    --green-light: #f0fff4;
+    --amber: #c05621;
+    --amber-light: #fffaf0;
+    --gray-50: #f7fafc;
+    --gray-100: #edf2f7;
+    --gray-200: #e2e8f0;
+    --gray-400: #a0aec0;
+    --gray-500: #718096;
+    --gray-600: #4a5568;
+    --gray-700: #2d3748;
+    --gray-800: #1a202c;
+    --red: #c53030;
+    --white: #ffffff;
+    --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.07), 0 4px 6px rgba(0,0,0,0.05);
+    --radius: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-700);
+    line-height: 1.6;
+  }
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 100%);
+    color: var(--white);
+    padding: 24px 0;
+    text-align: center;
+  }
+  .header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 4px; }
+  .header p { font-size: 14px; opacity: 0.85; }
+  .container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+  /* Cards */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--blue-light);
+  }
+  /* Layout */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+  /* Input Controls */
+  .input-group { margin-bottom: 16px; }
+  .input-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-600);
+    margin-bottom: 4px;
+  }
+  .slider-row { display: flex; align-items: center; gap: 10px; }
+  .slider-row input[type="range"] { flex: 1; accent-color: var(--blue); height: 6px; }
+  .slider-row .value-display {
+    min-width: 52px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--navy);
+    background: var(--gray-100);
+    border-radius: 6px;
+    padding: 4px 8px;
+  }
+  /* Toggle buttons */
+  .toggle-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .toggle-btn {
+    padding: 6px 16px;
+    border: 2px solid var(--gray-200);
+    border-radius: 6px;
+    background: var(--white);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-500);
+    transition: all 0.15s;
+  }
+  .toggle-btn.active {
+    border-color: var(--blue);
+    background: var(--blue-light);
+    color: var(--blue);
+  }
+  .toggle-btn:hover { border-color: var(--blue); }
+  /* Checkbox row */
+  .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .checkbox-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--gray-600); cursor: pointer;
+  }
+  .checkbox-item input[type="checkbox"] { accent-color: var(--blue); width: 16px; height: 16px; }
+  /* Result Display */
+  .result-box {
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+  .result-box.high { background: var(--green-light); border: 2px solid var(--green); }
+  .result-box.moderate { background: var(--amber-light); border: 2px solid var(--amber); }
+  .result-box.low { background: var(--gray-100); border: 2px solid var(--gray-400); }
+  .result-recommendation {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .result-box.high .result-recommendation { color: var(--green-dark); }
+  .result-box.moderate .result-recommendation { color: var(--amber); }
+  .result-box.low .result-recommendation { color: var(--gray-600); }
+  .result-subtitle { font-size: 13px; color: var(--gray-500); }
+  /* Metrics row */
+  .metrics-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .metric {
+    text-align: center;
+    padding: 12px 8px;
+    background: var(--gray-50);
+    border-radius: var(--radius);
+  }
+  .metric-value { font-size: 24px; font-weight: 800; color: var(--navy); }
+  .metric-label { font-size: 11px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.3px; }
+  /* Distribution chart */
+  .chart-wrap { height: 150px; margin-top: 12px; overflow: hidden; }
+  .chart-wrap canvas { display: block; width: 100%; height: 150px; }
+  .chart-label { font-size: 11px; color: var(--gray-500); text-align: center; margin-top: 4px; }
+  /* Gauge bar */
+  .gauge-container { margin-top: 16px; }
+  .gauge-bar {
+    height: 12px;
+    border-radius: 6px;
+    background: linear-gradient(to right, var(--gray-200) 0%, var(--amber) 40%, var(--green) 100%);
+    position: relative;
+  }
+  .gauge-marker {
+    position: absolute;
+    top: -6px;
+    width: 3px;
+    height: 24px;
+    background: var(--red);
+    border-radius: 2px;
+    transition: left 0.3s;
+  }
+  .gauge-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--gray-400); margin-top: 4px; }
+  /* Interpretation */
+  .interpretation {
+    margin-top: 16px;
+    padding: 16px;
+    background: var(--blue-light);
+    border-radius: var(--radius);
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--gray-700);
+  }
+  .interpretation strong { color: var(--navy); }
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 24px 16px;
+    font-size: 11px;
+    color: var(--gray-400);
+    line-height: 1.8;
+  }
+  .footer a { color: var(--blue); text-decoration: none; }
+  .disclaimer {
+    margin-top: 12px;
+    padding: 12px;
+    background: #fff5f5;
+    border: 1px solid #feb2b2;
+    border-radius: var(--radius);
+    font-size: 11px;
+    color: var(--red);
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Perioperative ACEI/ARB Decision Support Tool</h1>
+  <p>Individual Treatment Effect Estimation via Causal Forest Analysis</p>
+</div>
+
+<div class="container">
+  <div class="grid-2">
+    <!-- LEFT: Input -->
+    <div>
+      <div class="card">
+        <div class="card-title">Patient Characteristics</div>
+
+        <div class="input-group">
+          <label>Age (years)</label>
+          <div class="slider-row">
+            <input type="range" id="age" min="20" max="90" value="65" oninput="update()">
+            <div class="value-display" id="age-val">65</div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>eGFR (mL/min/1.73m²)</label>
+          <div class="slider-row">
+            <input type="range" id="egfr" min="10" max="150" value="80" oninput="update()">
+            <div class="value-display" id="egfr-val">80</div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>BMI (kg/m²)</label>
+          <div class="slider-row">
+            <input type="range" id="bmi" min="15" max="45" value="25" step="0.5" oninput="update()">
+            <div class="value-display" id="bmi-val">25.0</div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Sex</label>
+          <div class="toggle-group">
+            <div class="toggle-btn active" data-field="sex" data-value="1" onclick="toggleSelect(this)">Male</div>
+            <div class="toggle-btn" data-field="sex" data-value="0" onclick="toggleSelect(this)">Female</div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Comorbidities</label>
+          <div class="checkbox-grid">
+            <label class="checkbox-item"><input type="checkbox" id="htn" checked onchange="update()"> Hypertension</label>
+            <label class="checkbox-item"><input type="checkbox" id="dm" onchange="update()"> Diabetes</label>
+            <label class="checkbox-item"><input type="checkbox" id="hf" onchange="update()"> Heart Failure</label>
+            <label class="checkbox-item"><input type="checkbox" id="ckd" onchange="update()"> CKD</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Output -->
+    <div>
+      <div class="card">
+        <div class="card-title">Recommendation</div>
+        <div class="result-box" id="result-box">
+          <div class="result-recommendation" id="result-text">--</div>
+          <div class="result-subtitle" id="result-sub">Enter patient data</div>
+        </div>
+
+        <div class="metrics-row">
+          <div class="metric">
+            <div class="metric-value" id="cate-val">--</div>
+            <div class="metric-label">CATE</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value" id="nnt-val">--</div>
+            <div class="metric-label">NNT</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value" id="pctile-val">--</div>
+            <div class="metric-label">Percentile</div>
+          </div>
+        </div>
+
+        <div class="gauge-container">
+          <div class="gauge-bar">
+            <div class="gauge-marker" id="gauge-marker" style="left:50%"></div>
+          </div>
+          <div class="gauge-labels">
+            <span>Lower Benefit</span>
+            <span>Population Mean</span>
+            <span>Higher Benefit</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">CATE Distribution (N=9,456)</div>
+        <div class="chart-wrap"><canvas id="histChart"></canvas></div>
+        <div class="chart-label">Conditional Average Treatment Effect (CATE)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interpretation -->
+  <div class="card">
+    <div class="card-title">Clinical Interpretation</div>
+    <div class="interpretation" id="interpretation">
+      Adjust the patient characteristics above to generate a personalized recommendation.
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Research Tool — Not for Clinical Use.</strong> This calculator is based on observational data and a causal forest model.
+    Predictions are estimates and should not replace clinical judgment. For research and educational purposes only.
+  </div>
+</div>
+
+<div class="footer">
+  Perioperative ACEI/ARB Decision Support Tool &mdash; Based on causal forest analysis of 9,456 propensity score-matched cardiac surgery patients.<br>
+  <a href="#">Li Z, Zhong Q, et al. Annals of Intensive Care (2026, submitted).</a><br>
+  &copy; 2026 Chinese PLA General Hospital. All rights reserved.
+</div>
+
+<script>
+// ── Model Data (loaded inline for portability) ──
+const MODEL = {"coefficients":{"intercept":-0.00635259,"age":0.00021842,"egfr":0.00007317,"bmi":0.00008674,"sex_num":0.00405767,"diabetes_num":-0.00264446,"htn_num":0.00014309,"hf_num":-0.00260357,"ckd_num":0.00238429,"age_x_egfr":-9.39543303e-07,"age_x_diabetes_num":-0.00001562,"age_x_hf_num":0.00004081},"cate_stats":{"n":9456,"mean":0.01212862,"sd":0.00629472,"median":0.01161673,"q25":0.00834331,"q75":0.01603441,"min":-0.02098383,"max":0.04470428,"pct_positive":0.97430203},"cate_distribution":{"counts":[1,0,0,1,0,2,3,2,4,11,12,17,25,45,48,58,67,126,219,375,463,601,838,989,1002,824,677,626,571,480,399,285,210,147,103,70,40,41,25,17,10,7,7,3,2,2,0,0,0,1],"mids":[-0.02130695,-0.01995318,-0.01859942,-0.01724566,-0.0158919,-0.01453814,-0.01318437,-0.01183061,-0.01047685,-0.00912309,-0.00776932,-0.00641556,-0.0050618,-0.00370804,-0.00235428,-0.00100051,0.00035325,0.00170701,0.00306077,0.00441454,0.0057683,0.00712206,0.00847582,0.00982958,0.01118335,0.01253711,0.01389087,0.01524463,0.0165984,0.01795216,0.01930592,0.02065968,0.02201344,0.02336721,0.02472097,0.02607473,0.02742849,0.02878226,0.03013602,0.03148978,0.03284354,0.0341973,0.03555107,0.03690483,0.03825859,0.03961235,0.04096611,0.04231988,0.04367364,0.0450274]}};
+
+// ── State ──
+let selectedSex = 1;
+
+// ── Prediction ──
+function predictCATE(age, egfr, bmi, sex, dm, htn, hf, ckd) {
+  const c = MODEL.coefficients;
+  return c.intercept + c.age * age + c.egfr * egfr + c.bmi * bmi +
+         c.sex_num * sex + c.diabetes_num * dm + c.htn_num * htn +
+         c.hf_num * hf + c.ckd_num * ckd +
+         c.age_x_egfr * age * egfr +
+         c.age_x_diabetes_num * age * dm +
+         c.age_x_hf_num * age * hf;
+}
+
+function getPercentile(cate) {
+  const mids = MODEL.cate_distribution.mids;
+  const counts = MODEL.cate_distribution.counts;
+  const total = counts.reduce((a, b) => a + b, 0);
+  let cumul = 0;
+  for (let i = 0; i < mids.length; i++) {
+    cumul += counts[i];
+    if (mids[i] >= cate) return Math.round(cumul / total * 100);
+  }
+  return 100;
+}
+
+// ── Toggle Buttons ──
+function toggleSelect(el) {
+  const field = el.dataset.field;
+  el.parentElement.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  if (field === 'sex') selectedSex = parseInt(el.dataset.value);
+  update();
+}
+
+// ── Draw Histogram ──
+function drawHistogram(patientCate) {
+  const canvas = document.getElementById('histChart');
+  const wrap = canvas.parentElement;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  // 使用固定容器尺寸，阻断反馈循环
+  const W = wrap.clientWidth || 400;
+  const H = 150;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const mids = MODEL.cate_distribution.mids;
+  const counts = MODEL.cate_distribution.counts;
+  const maxCount = Math.max(...counts);
+  const xMin = mids[0] - 0.007, xMax = mids[mids.length - 1] + 0.007;
+  const pad = {l: 5, r: 5, t: 10, b: 24};
+
+  const toX = v => pad.l + (v - xMin) / (xMax - xMin) * (W - pad.l - pad.r);
+  const toY = v => pad.t + (1 - v / maxCount) * (H - pad.t - pad.b);
+  const barW = Math.max(2, (W - pad.l - pad.r) / mids.length - 1);
+
+  // Clear
+  ctx.clearRect(0, 0, W, H);
+
+  // Bars
+  for (let i = 0; i < mids.length; i++) {
+    const x = toX(mids[i]) - barW / 2;
+    const y = toY(counts[i]);
+    const h = H - pad.b - y;
+    ctx.fillStyle = mids[i] >= 0 ? '#bee3f8' : '#fed7d7';
+    ctx.fillRect(x, y, barW, h);
+  }
+
+  // Zero line
+  const zeroX = toX(0);
+  ctx.strokeStyle = '#a0aec0';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath(); ctx.moveTo(zeroX, pad.t); ctx.lineTo(zeroX, H - pad.b); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Mean line
+  const meanX = toX(MODEL.cate_stats.mean);
+  ctx.strokeStyle = '#2b6cb0';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([5, 3]);
+  ctx.beginPath(); ctx.moveTo(meanX, pad.t); ctx.lineTo(meanX, H - pad.b); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Patient marker
+  if (patientCate !== null) {
+    const px = toX(patientCate);
+    ctx.strokeStyle = '#c53030';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(px, pad.t - 4); ctx.lineTo(px, H - pad.b + 4); ctx.stroke();
+    // Triangle
+    ctx.fillStyle = '#c53030';
+    ctx.beginPath(); ctx.moveTo(px, pad.t - 4); ctx.lineTo(px - 5, pad.t - 12); ctx.lineTo(px + 5, pad.t - 12); ctx.closePath(); ctx.fill();
+    // Label
+    ctx.fillStyle = '#c53030';
+    ctx.font = 'bold 10px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Patient', px, H - pad.b + 16);
+  }
+
+  // Axis labels
+  ctx.fillStyle = '#a0aec0';
+  ctx.font = '9px sans-serif';
+  ctx.textAlign = 'center';
+  for (let v = -0.02; v <= 0.04; v += 0.01) {
+    ctx.fillText((v * 100).toFixed(0) + '%', toX(v), H - 4);
+  }
+}
+
+// ── Main Update ──
+function update() {
+  const age  = parseInt(document.getElementById('age').value);
+  const egfr = parseInt(document.getElementById('egfr').value);
+  const bmi  = parseFloat(document.getElementById('bmi').value);
+  const dm   = document.getElementById('dm').checked ? 1 : 0;
+  const htn  = document.getElementById('htn').checked ? 1 : 0;
+  const hf   = document.getElementById('hf').checked ? 1 : 0;
+  const ckd  = document.getElementById('ckd').checked ? 1 : 0;
+
+  document.getElementById('age-val').textContent = age;
+  document.getElementById('egfr-val').textContent = egfr;
+  document.getElementById('bmi-val').textContent = bmi.toFixed(1);
+
+  const cate = predictCATE(age, egfr, bmi, selectedSex, dm, htn, hf, ckd);
+  const nnt = cate > 0 ? Math.round(1 / cate) : '—';
+  const pctile = getPercentile(cate);
+
+  // Metrics
+  document.getElementById('cate-val').textContent = (cate * 100).toFixed(2) + '%';
+  document.getElementById('nnt-val').textContent = nnt;
+  document.getElementById('pctile-val').textContent = pctile + 'th';
+
+  // Recommendation
+  const box = document.getElementById('result-box');
+  const txt = document.getElementById('result-text');
+  const sub = document.getElementById('result-sub');
+  box.className = 'result-box';
+
+  if (cate >= 0.015) {
+    box.classList.add('high');
+    txt.textContent = '✦ Strongly Recommend Continuation';
+    sub.textContent = 'This patient has above-average estimated benefit from ACEI/ARB continuation.';
+  } else if (cate >= 0.008) {
+    box.classList.add('moderate');
+    txt.textContent = '● Recommend Continuation';
+    sub.textContent = 'This patient has moderate estimated benefit from ACEI/ARB continuation.';
+  } else {
+    box.classList.add('low');
+    txt.textContent = '○ Individualized Decision';
+    sub.textContent = 'Estimated benefit is small. Consider patient-specific factors.';
+  }
+
+  // Gauge
+  const stats = MODEL.cate_stats;
+  const gaugePos = Math.max(0, Math.min(100, (cate - stats.min) / (stats.max - stats.min) * 100));
+  document.getElementById('gauge-marker').style.left = gaugePos + '%';
+
+  // Histogram
+  drawHistogram(cate);
+
+  // Interpretation
+  const interp = document.getElementById('interpretation');
+  const catePct = (cate * 100).toFixed(2);
+  const direction = cate > 0 ? 'higher' : 'lower';
+  const actionWord = cate > 0 ? 'continuation' : 'discontinuation';
+
+  interp.innerHTML = `
+    <strong>For this ${age}-year-old ${selectedSex === 1 ? 'male' : 'female'} patient</strong> with eGFR ${egfr} mL/min/1.73m² and BMI ${bmi.toFixed(1)}:<br><br>
+    The estimated <strong>Conditional Average Treatment Effect (CATE)</strong> is <strong>${catePct}%</strong>.
+    This means that preoperative discontinuation of ACEI/ARB is associated with a ${Math.abs(catePct)}% ${direction} risk of composite adverse events compared with ${actionWord}.
+    ${cate > 0 ? `To prevent one additional adverse event, approximately <strong>${nnt} patients</strong> like this individual would need to continue ACEI/ARB perioperatively (NNT = ${nnt}).` : ''}
+    <br><br>
+    This patient is at the <strong>${pctile}th percentile</strong> of the study population's CATE distribution (N = 9,456).
+    ${pctile >= 75 ? 'This places them in the <strong>highest quartile of estimated benefit</strong>, suggesting strong evidence for continuation.' :
+      pctile >= 25 ? 'This places them in the <strong>middle range of estimated benefit</strong>.' :
+      'This places them in the <strong>lowest quartile of estimated benefit</strong>. Clinical judgment should weigh other patient-specific factors.'}
+  `;
+}
+
+// ── Debounced resize ──
+let resizeTimer;
+window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(update, 100); });
+
+// Init
+window.addEventListener('load', update);
+</script>
+
+</body>
+</html>

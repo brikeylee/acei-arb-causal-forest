@@ -1,0 +1,4 @@
+"final_recommendation","confidence_level","n_patients","percentage","mean_cate","sd_cate","mean_age","mean_egfr"
+"Continue ACE/ARB (moderate evidence)","Moderate",4728,50,0.0118252310884912,0.00214053123434305,58.377538071066,91.0834885000952
+"Continue ACE/ARB (strong evidence of benefit)","High",2364,25,0.0202364781574098,0.00375837939866096,64.3422165820643,81.4719469126832
+"Individualized decision","Low",2364,25,0.00462753792488114,0.0036074533681574,57.3494923857868,86.82568105672

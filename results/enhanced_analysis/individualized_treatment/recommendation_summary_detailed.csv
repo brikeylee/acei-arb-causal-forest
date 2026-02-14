@@ -1,0 +1,4 @@
+"recommendation","confidence","n_patients","percentage","mean_cate","mean_benefit"
+"Individualized Decision","Low",2358,25,0.0134,1.34
+"Moderate Continue","Moderate",4714,50,0.0172,1.72
+"Strong Continue","High",2358,25,0.023,2.3

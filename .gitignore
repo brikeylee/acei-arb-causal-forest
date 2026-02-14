@@ -1,0 +1,45 @@
+# ══════════════════════════════════════════
+# DATA FILES — MUST NOT BE PUBLIC
+# ══════════════════════════════════════════
+baseline/
+*.xlsx
+*.xls
+
+# Result CSVs containing patient-level data
+results/main_analysis/matching/matched_data.csv
+results/main_analysis/causal_forest/matched_data_with_cate.csv
+results/main_analysis/causal_forest/high_benefit_subgroup.csv
+results/main_analysis/causal_forest/high_risk_subgroup.csv
+results/enhanced_analysis/individualized_treatment/individual_recommendations.csv
+
+# Model files (contain fitted data)
+results/main_analysis/models/
+results/enhanced_analysis/clinical_decision_support/decision_tree_model.rds
+results/main_analysis/benefit_risk/detailed_results.rds
+
+# ══════════════════════════════════════════
+# SAFE TO PUSH — aggregate results only
+# ══════════════════════════════════════════
+# (everything else in results/ is aggregate statistics)
+
+# ══════════════════════════════════════════
+# R
+# ══════════════════════════════════════════
+.Rhistory
+.Rdata
+.RData
+.Rproj.user/
+*.Rproj
+
+# System
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.cursor/
+.specstory/
+
+# Temporary
+*.tmp
+*~

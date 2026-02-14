@@ -1,0 +1,2 @@
+"method","outcome","OR","OR_CI_lower","OR_CI_upper","RD","p_value"
+"IPTW (stabilized, trimmed)","adverse_event",1.236651840062,1.07773366621104,1.41900343422071,0.016637392041598,0.00100717686977154
