@@ -1,0 +1,4 @@
+"cluster","n_patients","pct","mean_cate","sd_cate","mean_age","mean_egfr","mean_bmi","prop_htn","prop_dm","recommendation"
+1,513,5.4,0.011,0.005,52.055,97.642,24.571,0,0.267,"Individualized decision"
+2,3231,34.2,0.01,0.007,63.83,81.382,26.218,1,0.991,"Individualized decision"
+3,5712,60.4,0.013,0.006,57.904,90.242,25.483,1,0.002,"Moderate recommendation for continuation"
